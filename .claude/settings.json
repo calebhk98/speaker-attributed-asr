@@ -1,0 +1,15 @@
+{
+  "$comment": "Project Claude Code config. The SessionStart hook makes every session (including parallel web sessions picking up an engine issue) land in a ready-to-run state: venv present, dev deps installed. Idempotent and quiet.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && python -m venv .venv 2>/dev/null; ./.venv/bin/pip install -q -e '.[dev]' >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  }
+}
