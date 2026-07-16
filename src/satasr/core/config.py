@@ -24,6 +24,10 @@ class MixingConfig:
     min_truncation_s: float = 0.01
     max_truncation_s: float = 3.0
 
+    # How often the scheduler tries to overlap a new clip onto an active one
+    # (vs. placing it after). The target peak count still caps actual overlap.
+    overlap_probability: float = 0.8
+
     # Fraction of interrupted utterances left uncut (speaker talks through it).
     uncut_probability: float = 0.5
 

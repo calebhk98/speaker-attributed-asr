@@ -20,8 +20,12 @@ def _clip(speaker: str, duration_s: float, level: float = 0.5) -> SpeakerClip:
         Word(f"{speaker}{i}", i * 0.5, (i + 1) * 0.5)
         for i in range(max(1, int(duration_s / 0.5)))
     )
-    return SpeakerClip(audio=audio, text=" ".join(w.text for w in words),
-                       speaker_id=speaker, words=words)
+    return SpeakerClip(
+        audio=audio,
+        text=" ".join(w.text for w in words),
+        speaker_id=speaker,
+        words=words,
+    )
 
 
 def _mixer(seed: int) -> OverlapMixer:

@@ -56,6 +56,11 @@ select = [
 ]
 ignore = ["PLR0913"]  # allow constructors with several keyword args
 
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on literal expected values and repeat small fixtures — that's the
+# nature of tests, not a smell to refactor away.
+"tests/**" = ["PLR2004"]
+
 [tool.ruff.lint.pylint]
 # "Never nesting": cap branch/return complexity so functions stay flat.
 max-branches = 6
