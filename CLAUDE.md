@@ -64,8 +64,11 @@ Each engine is one self-contained GitHub issue and touches only new files:
    single `_render(text, voice) -> AudioBuffer` method. Everything else
    (validation, the voice contract, clip packaging) is inherited — do not
    reimplement it.
-3. Decorate the class with `@TTS_ENGINES.register("<engine>")`.
-4. Add one import line to `src/satasr/tts/engines/__init__.py`.
+3. Decorate the class with `@TTS_ENGINES.register("<engine>")`. The file is
+   **auto-discovered** — you do not edit `engines/__init__.py` or any other
+   shared file. This is what keeps engines conflict-free in parallel.
+4. Keep the heavy third-party library import **inside** `_render` (never at
+   module top level) so discovery stays cheap and weight-free.
 5. Add `tests/tts/engines/test_<engine>.py`. Mark tests that download weights or
    need a GPU with `@pytest.mark.slow` so CI stays fast; add a lightweight test
    (shape/contract) that runs without weights.
