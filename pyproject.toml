@@ -18,6 +18,10 @@ dependencies = [
     "numpy>=1.24",
 ]
 
+[project.scripts]
+# The single end-to-end entry point: `satasr run --config config.example.toml`.
+satasr = "satasr.cli:main"
+
 [project.optional-dependencies]
 # Developer tooling only — no model weights required.
 dev = [

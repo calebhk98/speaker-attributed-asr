@@ -58,6 +58,26 @@ python -m venv .venv
 .venv/bin/python -m pytest        # fast suite, no weights needed
 ```
 
+## One command to run the whole pipeline
+
+Everything is driven by a single TOML config and one entry point:
+
+```bash
+satasr run --config config.example.toml            # execute the configured stages
+satasr run --config config.example.toml --dry-run  # just print the stage plan
+```
+
+`config.example.toml` is a complete, annotated config. As shipped it runs the
+`build_dataset` stage end-to-end on the dependency-free `sine` engine — text →
+TTS → alignment → overlap mixing → augmentation → an on-disk dataset (audio +
+`manifest.jsonl` with serialized, speaker-tagged, timestamped transcripts, split
+into train/val/test) — so it works anywhere, no weights or GPU. The config
+selects the text source, engines + weights, augmentation chain, mixing knobs,
+and which `stages` to run (`build_dataset`, `phase1`, `phase2`, `evaluate`). The
+training/eval stages need the model backend + a checkpoint and are enabled on
+the GPU host. See [`config.example.toml`](config.example.toml) and
+`src/satasr/run/`.
+
 The dependency-free `sine` reference engine lets you run the whole pipeline in
 CI without downloading any model weights. Real engines are added one GitHub
 issue at a time — see the issue tracker, each is self-contained and parallel.
