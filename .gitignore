@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Project data — never commit weights, audio corpora, or generated datasets.
+data/
+datasets/
+checkpoints/
+*.wav
+*.flac
+*.mp3
+*.pt
+*.ckpt
+*.safetensors
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

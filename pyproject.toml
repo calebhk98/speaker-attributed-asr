@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "satasr"
+version = "0.1.0"
+description = "Multi-talker, speaker-attributed ASR with serialized output (diarization-conditioned Whisper)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "speaker-attributed-asr contributors" }]
+
+# Runtime deps are intentionally minimal. Heavy, optional back-ends (torch,
+# specific TTS engines, aligners) are declared as extras so a contributor can
+# work on one slice without installing everything. See docs/architecture.md.
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# Developer tooling only — no model weights required.
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pre-commit>=3.8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/satasr"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: tests that download weights or need a GPU (deselected by default)",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# A focused rule set that enforces the house style: small functions, no deep
+# nesting, sorted imports, no unused code.
+select = [
+    "E", "F", "W",   # pyflakes + pycodestyle
+    "I",              # import sorting (single source of truth for import order)
+    "B",              # bugbear
+    "UP",             # pyupgrade
+    "SIM",            # flake8-simplify (discourages nesting)
+    "PLR",            # pylint refactor (complexity limits)
+]
+ignore = ["PLR0913"]  # allow constructors with several keyword args
+
+[tool.ruff.lint.pylint]
+# "Never nesting": cap branch/return complexity so functions stay flat.
+max-branches = 6
+max-nested-blocks = 3
+max-returns = 6
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "tests"]

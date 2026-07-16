@@ -1,0 +1,39 @@
+# Pre-commit is the single gate every commit passes through locally.
+# Install once with:  pre-commit install
+# Run on demand with: pre-commit run --all-files
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files  # keep weights/audio out of git
+        args: ["--maxkb=512"]
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff          # lint (enforces never-nesting complexity caps)
+        args: ["--fix"]
+      - id: ruff-format   # format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        additional_dependencies: ["numpy>=1.24"]
+        args: ["--config-file=pyproject.toml"]
+
+  # Fast unit tests run on every commit. The heavy, weight-downloading tests
+  # are marked `slow` and excluded here (see pyproject.toml).
+  - repo: local
+    hooks:
+      - id: pytest-fast
+        name: pytest (fast tests)
+        entry: python -m pytest -q -m "not slow"
+        language: system
+        pass_filenames: false
+        types: [python]
