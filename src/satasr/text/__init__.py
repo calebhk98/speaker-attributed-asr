@@ -6,6 +6,7 @@ nowhere else — the single place that knows the full text-source roster
 """
 
 from satasr.text import (
+    llm,  # noqa: F401  (import for registration)
     plain_file,  # noqa: F401  (import for registration)
     static,  # noqa: F401  (import for registration)
     wikipedia,  # noqa: F401  (import for registration)
@@ -13,4 +14,11 @@ from satasr.text import (
 from satasr.text.registry import TEXT_SOURCES
 from satasr.text.splitting import split_sentences
 
-__all__ = ["TEXT_SOURCES", "split_sentences", "plain_file", "static", "wikipedia"]
+__all__ = [
+    "TEXT_SOURCES",
+    "split_sentences",
+    "llm",
+    "plain_file",
+    "static",
+    "wikipedia",
+]

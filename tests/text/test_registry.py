@@ -6,4 +6,6 @@ from satasr.text import TEXT_SOURCES
 
 
 def test_all_built_in_sources_are_registered() -> None:
-    assert TEXT_SOURCES.available() == ["plain_file", "static", "wikipedia"]
+    # Containment, not equality: adding a new source must not break this test.
+    registered = set(TEXT_SOURCES.available())
+    assert {"plain_file", "static", "wikipedia", "llm"} <= registered
