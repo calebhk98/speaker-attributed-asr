@@ -16,9 +16,11 @@ venv/
 htmlcov/
 
 # Project data — never commit weights, audio corpora, or generated datasets.
-data/
-datasets/
-checkpoints/
+# Root-anchored so they block top-level output dirs, NOT source packages such
+# as src/satasr/data/ or tests/data/.
+/data/
+/datasets/
+/checkpoints/
 *.wav
 *.flac
 *.mp3
