@@ -22,6 +22,11 @@ class BaseTTSEngine(ABC):
     name: str = ""
     #: True if the engine clones a voice from reference audio (design §4.4).
     supports_cloning: bool = False
+    #: Hugging Face repo id(s) / model identifiers this engine needs at runtime.
+    #: Declared here (not buried in ``_render``) so the model downloader can
+    #: fetch weights ahead of time without importing the heavy library. Empty
+    #: means "no pre-downloadable weights declared".
+    model_ids: tuple[str, ...] = ()
 
     def synthesize(self, text: str, voice: VoiceReference) -> SpeakerClip:
         """Validate, render, and package one single-speaker clip."""
