@@ -54,6 +54,9 @@ class NemoFastPitchTTSEngine(BaseTTSEngine):
 
     name = "nemo_fastpitch"
     supports_cloning = False
+    #: NeMo pretrained names this engine loads: the FastPitch spectrogram
+    #: model and its matching HiFi-GAN vocoder (see the constants above).
+    model_ids: tuple[str, ...] = (_SPEC_MODEL_NAME, _VOCODER_MODEL_NAME)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with FastPitch's preset ``voice.preset`` speaker.

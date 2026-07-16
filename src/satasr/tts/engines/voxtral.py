@@ -52,6 +52,9 @@ class VoxtralTTSEngine(BaseTTSEngine):
 
     name = "voxtral"
     supports_cloning = False
+    #: Served remotely via vLLM-Omni; this client only calls its
+    #: OpenAI-compatible API, so there are no local weights to pre-fetch.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with Voxtral's preset ``voice.preset`` voice.

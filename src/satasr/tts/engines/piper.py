@@ -38,6 +38,10 @@ class PiperTTSEngine(BaseTTSEngine):
 
     name = "piper"
     supports_cloning = False
+    #: Piper's default preset voice model (see ``_DEFAULT_VOICE`` above);
+    #: other presets name additional Piper voice models, fetchable the same
+    #: way, that aren't enumerated here.
+    model_ids: tuple[str, ...] = (_DEFAULT_VOICE,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with Piper's preset ``voice.preset`` voice.

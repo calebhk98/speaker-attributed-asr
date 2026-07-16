@@ -31,6 +31,10 @@ class MetaVoice1BTTSEngine(BaseTTSEngine):
 
     name = "metavoice_1b"
     supports_cloning = True
+    #: ``TTS()`` takes no explicit checkpoint argument in this code path; the
+    #: ``fam`` package manages its own default weights, so no single
+    #: fetchable repo id is declared here.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with MetaVoice-1B.

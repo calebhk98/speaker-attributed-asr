@@ -34,6 +34,9 @@ class BarkTTSEngine(BaseTTSEngine):
 
     name = "bark"
     supports_cloning = False
+    #: Suno's Bark checkpoint set, fetched by ``preload_models()`` under the
+    #: hood; not parameterized in this code path, so declared explicitly here.
+    model_ids: tuple[str, ...] = ("suno/bark",)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with Bark's preset ``voice.preset`` history prompt.

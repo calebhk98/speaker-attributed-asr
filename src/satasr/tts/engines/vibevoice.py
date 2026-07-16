@@ -43,6 +43,8 @@ class VibeVoiceTTSEngine(BaseTTSEngine):
 
     name = "vibevoice"
     supports_cloning = True
+    #: VibeVoice checkpoint this engine loads (see ``_MODEL_NAME`` above).
+    model_ids: tuple[str, ...] = (_MODEL_NAME,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with VibeVoice.

@@ -42,6 +42,9 @@ class SesameCsmTTSEngine(BaseTTSEngine):
 
     name = "sesame_csm"
     supports_cloning = True
+    #: Sesame's CSM-1B checkpoint, fetched by ``load_csm_1b()`` under the
+    #: hood; not parameterized in this code path, so declared here.
+    model_ids: tuple[str, ...] = ("sesame/csm-1b",)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with CSM.

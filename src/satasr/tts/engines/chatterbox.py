@@ -41,6 +41,9 @@ class ChatterboxTTSEngine(BaseTTSEngine):
 
     name = "chatterbox"
     supports_cloning = True
+    #: Resemble AI's Chatterbox checkpoint, fetched by ``from_pretrained()``
+    #: under the hood; not parameterized in this code path, so declared here.
+    model_ids: tuple[str, ...] = ("ResembleAI/chatterbox",)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with Chatterbox.

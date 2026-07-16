@@ -45,6 +45,8 @@ class Qwen3TTSEngine(BaseTTSEngine):
 
     name = "qwen3_tts"
     supports_cloning = True
+    #: Qwen3-TTS checkpoint this engine loads (see ``_MODEL_ID`` above).
+    model_ids: tuple[str, ...] = (_MODEL_ID,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with it.

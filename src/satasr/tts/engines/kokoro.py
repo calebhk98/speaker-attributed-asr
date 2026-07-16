@@ -50,6 +50,10 @@ class KokoroTTSEngine(BaseTTSEngine):
 
     name = "kokoro"
     supports_cloning = False
+    #: Kokoro-82M's HF repo (see the VOICES.md reference above);
+    #: ``KPipeline()`` fetches it by default, not parameterized in this code
+    #: path, so declared explicitly here.
+    model_ids: tuple[str, ...] = ("hexgrad/Kokoro-82M",)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with Kokoro's preset ``voice.preset``.

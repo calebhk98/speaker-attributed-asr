@@ -41,6 +41,8 @@ class F5TTSEngine(BaseTTSEngine):
 
     name = "f5_tts"
     supports_cloning = True
+    #: F5-TTS checkpoint name this engine loads (see ``_MODEL_NAME`` above).
+    model_ids: tuple[str, ...] = (_MODEL_NAME,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with F5-TTS.

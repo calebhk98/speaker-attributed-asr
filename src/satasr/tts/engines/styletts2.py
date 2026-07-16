@@ -34,6 +34,10 @@ class StyleTTS2TTSEngine(BaseTTSEngine):
 
     name = "styletts2"
     supports_cloning = True
+    #: ``StyleTTS2()`` takes no explicit checkpoint argument in this code
+    #: path; the wrapping package manages its own default weights, so no
+    #: single fetchable repo id is declared here.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with StyleTTS 2.

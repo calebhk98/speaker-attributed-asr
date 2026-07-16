@@ -55,6 +55,8 @@ class DiaTTSEngine(BaseTTSEngine):
 
     name = "dia"
     supports_cloning = False
+    #: Dia checkpoint this engine loads (see ``_MODEL_ID`` above).
+    model_ids: tuple[str, ...] = (_MODEL_ID,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize one speaker-tagged utterance with Dia.

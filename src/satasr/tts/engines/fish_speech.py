@@ -35,6 +35,10 @@ class FishSpeechTTSEngine(BaseTTSEngine):
 
     name = "fish_speech"
     supports_cloning = True
+    #: ``TTSInferenceEngine.from_pretrained()`` takes no explicit checkpoint
+    #: id here, and Fish Speech has shipped several versioned checkpoints
+    #: (S1/S1-mini/S2), so no single id is declared.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio``'s timbre and speak ``text``.

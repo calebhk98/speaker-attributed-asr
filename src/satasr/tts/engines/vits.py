@@ -41,6 +41,8 @@ class VitsTTSEngine(BaseTTSEngine):
 
     name = "vits"
     supports_cloning = False
+    #: Coqui model id VITS/VCTK loads (see ``_MODEL_NAME`` above).
+    model_ids: tuple[str, ...] = (_MODEL_NAME,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with VITS's preset ``voice.preset`` speaker id.

@@ -45,6 +45,10 @@ class GptSovitsTTSEngine(BaseTTSEngine):
 
     name = "gpt_sovits"
     supports_cloning = True
+    #: GPT-SoVITS resolves its pretrained checkpoints via the bundled
+    #: ``_CONFIG_PATH`` yaml (local paths baked into the package), not a
+    #: single fetchable repo id, so none is declared here.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with GPT-SoVITS.

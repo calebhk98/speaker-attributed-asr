@@ -63,6 +63,8 @@ class OrpheusTTSEngine(BaseTTSEngine):
 
     name = "orpheus"
     supports_cloning = True
+    #: Orpheus checkpoint this engine loads (see ``_MODEL_NAME`` above).
+    model_ids: tuple[str, ...] = (_MODEL_NAME,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with Orpheus.

@@ -39,6 +39,8 @@ class XttsV2TTSEngine(BaseTTSEngine):
 
     name = "xtts_v2"
     supports_cloning = True
+    #: Coqui model id XTTS v2 loads (see ``_MODEL_NAME`` above).
+    model_ids: tuple[str, ...] = (_MODEL_NAME,)
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Clone ``voice.reference_audio`` and speak ``text`` with XTTS v2.

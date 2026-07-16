@@ -47,6 +47,11 @@ class OpenVoiceTTSEngine(BaseTTSEngine):
 
     name = "openvoice"
     supports_cloning = True
+    #: Both stages resolve their weights implicitly — MeloTTS's base-speaker
+    #: model (no explicit repo id passed) and OpenVoice's converter from
+    #: local checkpoint files (``_CONVERTER_DIR`` / ``_BASE_SPEAKER_SE_PATH``)
+    #: — so no single fetchable repo id is declared here.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Speak ``text`` with MeloTTS, then clone ``voice`` onto it.

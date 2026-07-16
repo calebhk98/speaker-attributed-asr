@@ -44,6 +44,9 @@ class MoshiTTSEngine(BaseTTSEngine):
 
     name = "moshi"
     supports_cloning = False
+    #: Both of Kyutai's preset voice checkpoints (see ``_PRESET_REPOS``
+    #: above); either may be fetched depending on ``voice.preset``.
+    model_ids: tuple[str, ...] = tuple(_PRESET_REPOS.values())
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with Moshi's preset ``voice.preset`` checkpoint.

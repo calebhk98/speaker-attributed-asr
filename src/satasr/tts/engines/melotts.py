@@ -48,6 +48,10 @@ class MeloTTSEngine(BaseTTSEngine):
 
     name = "melotts"
     supports_cloning = False
+    #: Each preset selects a different per-language model
+    #: (``melo.api.TTS(language=...)``); no single fixed repo id is resolved
+    #: in this code, so none is declared here.
+    model_ids: tuple[str, ...] = ()
 
     def _render(self, text: str, voice: VoiceReference) -> AudioBuffer:
         """Synthesize ``text`` with MeloTTS's preset ``voice.preset`` speaker.
