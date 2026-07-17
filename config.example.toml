@@ -37,6 +37,16 @@ sentences = [
 # for a real run add e.g. xtts_v2 = 2000.0, kokoro = 500.0, etc. (design §4.3).
 sine = 1.0
 
+# Voice bank (design §4.4). Leave unset to give speakers synthetic presets
+# (works for preset engines only). To use cloning engines (xtts_v2, f5_tts,
+# chatterbox, ...), point voice_source_dir at a directory with one subdirectory
+# of .wav reference clips per speaker (e.g. LibriVox / Common Voice speakers);
+# each clip is then cloned. voice_presets supplies presets for any non-cloning
+# engines while a bank is in use. A clip's speaker count is capped to the number
+# of speakers in the bank.
+# voice_source_dir = "data/voices"
+# voice_presets = ["af_heart", "am_adam"]
+
 # Acoustic augmentation chain, applied in order (design §4.9). Repeat the block
 # to add more. `white_noise` gets a seeded rng injected automatically.
 [[dataset.augment]]

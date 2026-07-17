@@ -34,6 +34,14 @@ class DatasetStageConfig:
     engine_weights: dict[str, float] = field(default_factory=lambda: {"sine": 1.0})
     augment: tuple[AugmentSpec, ...] = ()
 
+    # Voice assignment (design §4.4). With ``voice_source_dir`` unset, speakers
+    # get synthetic presets — fine for preset engines, but cloning engines need
+    # real reference audio, so point this at a VoiceBank directory (one
+    # subdirectory of .wav clips per speaker) to use them. ``voice_presets``
+    # supplies presets for any non-cloning engines when a bank is in use.
+    voice_source_dir: str | None = None
+    voice_presets: tuple[str, ...] = ()
+
 
 @dataclass(frozen=True)
 class TrainingStageConfig:

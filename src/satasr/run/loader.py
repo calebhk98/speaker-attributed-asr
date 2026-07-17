@@ -47,9 +47,9 @@ def _dataset(table: Mapping[str, Any]) -> DatasetStageConfig:
         AugmentSpec(name=item["name"], options=dict(item.get("options", {})))
         for item in table.get("augment", ())
     )
-    return DatasetStageConfig(
-        augment=augment, **_kwargs(DatasetStageConfig, table, {"augment"})
-    )
+    voice_presets = tuple(table.get("voice_presets", ()))
+    known = _kwargs(DatasetStageConfig, table, {"augment", "voice_presets"})
+    return DatasetStageConfig(augment=augment, voice_presets=voice_presets, **known)
 
 
 def _evaluate(table: Mapping[str, Any]) -> EvalStageConfig:

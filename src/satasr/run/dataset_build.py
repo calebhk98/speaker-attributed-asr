@@ -15,14 +15,19 @@ from dataclasses import dataclass, replace
 
 from satasr.alignment import ALIGNERS
 from satasr.augment import AUGMENTERS, AugmentChain
-from satasr.core.interfaces import Aligner, Augmenter, TTSEngine, VoiceReference
+from satasr.core.interfaces import Aligner, Augmenter, TTSEngine
 from satasr.core.models import SpeakerClip, SpeakerCounts
 from satasr.mixing import OverlapMixer
-from satasr.pipeline.balancing import BalancingConfig, plan_clip_counts
+from satasr.pipeline.balancing import (
+    DEFAULT_TOTAL_WEIGHTS,
+    BalancingConfig,
+    plan_clip_counts,
+)
 from satasr.pipeline.dataset_writer import DatasetWriter
 from satasr.pipeline.text_feed import endless_sentences
 from satasr.run.config import AugmentSpec, PipelineConfig
 from satasr.run.engine_pool import EnginePool
+from satasr.run.voices import VoiceProvider, build_voice_provider
 from satasr.text import TEXT_SOURCES
 
 
@@ -48,12 +53,13 @@ def build_dataset(
     augment = _chain(dataset.augment, rng)
     writer = DatasetWriter(dataset.output_dir)
     engines = EnginePool(dataset.engine_weights)
+    voices = build_voice_provider(dataset, config.seed)
     mixer = OverlapMixer(config.mixing, rng)
 
-    plan = plan_clip_counts(dataset.num_examples, _balancing(config), rng)
+    plan = plan_clip_counts(dataset.num_examples, _balancing(config, voices), rng)
     splits: Counter[str] = Counter()
     for index, counts in enumerate(plan):
-        clips = _example_clips(counts, text, engines, aligner, rng)
+        clips = _example_clips(counts, text, engines, aligner, voices, rng)
         mixed = mixer.mix(clips, counts)
         row = writer.write(
             f"clip{index:06d}", mixed.with_audio(augment.apply(mixed.audio))
@@ -62,15 +68,28 @@ def build_dataset(
     return BuildSummary(len(plan), dataset.output_dir, dict(splits))
 
 
-def _balancing(config: PipelineConfig) -> BalancingConfig:
-    """Cap the simultaneous-speaker draw at the run's configured ceiling (§4.6)."""
+def _balancing(config: PipelineConfig, voices: VoiceProvider) -> BalancingConfig:
+    """Cap the draws to the run's ceiling (§4.6) and the available voice count.
+
+    Simultaneous overlap can never exceed ``max_simultaneous_speakers``; the
+    total distinct speakers per clip can never exceed how many voices exist
+    (a bank of N speakers cannot fill a larger clip).
+    """
     ceiling = config.mixing.max_simultaneous_speakers
-    weights = {
-        count: weight
-        for count, weight in config.mixing.simultaneous_weights.items()
-        if count <= ceiling
-    }
-    return BalancingConfig(simultaneous_weights=weights)
+    simultaneous = _cap(config.mixing.simultaneous_weights, ceiling)
+    capacity = voices.capacity()
+    if capacity is None:
+        return BalancingConfig(simultaneous_weights=simultaneous)
+    return BalancingConfig(
+        total_weights=_cap(DEFAULT_TOTAL_WEIGHTS, capacity),
+        simultaneous_weights=simultaneous,
+    )
+
+
+def _cap(weights: dict[int, float], ceiling: int) -> dict[int, float]:
+    """Keep only speaker counts that fit within ``ceiling`` (>= 1 guaranteed)."""
+    kept = {count: weight for count, weight in weights.items() if count <= ceiling}
+    return kept if kept else {1: 1.0}
 
 
 def _example_clips(
@@ -78,28 +97,25 @@ def _example_clips(
     text: Iterator[str],
     engines: EnginePool,
     aligner: Aligner,
+    voices: VoiceProvider,
     rng: random.Random,
 ) -> list[SpeakerClip]:
     return [
-        _one_clip(f"S{speaker + 1}", next(text), engines.pick(rng), aligner)
-        for speaker in range(counts.total)
+        _one_clip(speaker_id, next(text), engines.pick(rng), voices, aligner)
+        for speaker_id in voices.speaker_ids(counts.total, rng)
     ]
 
 
 def _one_clip(
-    speaker_id: str, sentence: str, engine: TTSEngine, aligner: Aligner
+    speaker_id: str,
+    sentence: str,
+    engine: TTSEngine,
+    voices: VoiceProvider,
+    aligner: Aligner,
 ) -> SpeakerClip:
-    clip = engine.synthesize(sentence, _voice(speaker_id, engine))
+    voice = voices.reference(speaker_id, supports_cloning=engine.supports_cloning)
+    clip = engine.synthesize(sentence, voice)
     return replace(clip, words=aligner.align(clip.audio, clip.text))
-
-
-def _voice(speaker_id: str, engine: TTSEngine) -> VoiceReference:
-    if engine.supports_cloning:
-        raise ValueError(
-            f"engine {engine.name!r} clones voices; wire a VoiceBank (issue #31) "
-            "before using cloning engines in a run"
-        )
-    return VoiceReference(speaker_id=speaker_id, preset=speaker_id)
 
 
 def _chain(specs: tuple[AugmentSpec, ...], rng: random.Random) -> AugmentChain:
