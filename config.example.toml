@@ -1,0 +1,83 @@
+# Example end-to-end pipeline configuration.
+#
+# Run it with:   satasr run --config config.example.toml
+# Preview only:  satasr run --config config.example.toml --dry-run
+#
+# As written this builds a small synthetic dataset with the dependency-free
+# `sine` reference engine, so it runs anywhere (no weights, no GPU). To do a
+# real run, add real engines to [dataset.engine_weights], point the training /
+# eval stages at a DiCoW checkpoint, and add them to `stages` (see below).
+
+seed = 0
+
+# The ordered list of stages to run. `build_dataset` runs offline; `phase1`,
+# `phase2` and `evaluate` require the model/torch backend + a checkpoint and are
+# left out here on purpose — add them once you are on the GPU host.
+stages = ["build_dataset"]
+
+[dataset]
+output_dir = "data/synthetic"
+num_examples = 20
+text_source = "static"          # a satasr.text registry name (static/plain_file/wikipedia/llm)
+aligner = "proportional"        # a satasr.alignment registry name (proportional/ctc_segmentation/mfa)
+
+[dataset.text_options]
+# kwargs passed to the text source. `static` takes an explicit sentence list;
+# swap in text_source = "wikipedia" (+ its options) for a real corpus.
+sentences = [
+    "So when we go to Africa we need some protection from lions.",
+    "Wait, we are going to Africa?",
+    "While those two plan their trip, how was the salon?",
+    "The lions out on the plain look hungry today.",
+    "Honestly I would rather stay home and read.",
+]
+
+[dataset.engine_weights]
+# engine name -> relative weight. Only `sine` runs without model weights here;
+# for a real run add e.g. xtts_v2 = 2000.0, kokoro = 500.0, etc. (design §4.3).
+sine = 1.0
+
+# Voice bank (design §4.4). Leave unset to give speakers synthetic presets
+# (works for preset engines only). To use cloning engines (xtts_v2, f5_tts,
+# chatterbox, ...), point voice_source_dir at a directory with one subdirectory
+# of .wav reference clips per speaker (e.g. LibriVox / Common Voice speakers);
+# each clip is then cloned. voice_presets supplies presets for any non-cloning
+# engines while a bank is in use. A clip's speaker count is capped to the number
+# of speakers in the bank.
+# voice_source_dir = "data/voices"
+# voice_presets = ["af_heart", "am_adam"]
+
+# Acoustic augmentation chain, applied in order (design §4.9). Repeat the block
+# to add more. `white_noise` gets a seeded rng injected automatically.
+[[dataset.augment]]
+name = "gain"
+options = { gain_db = -1.0 }
+
+[[dataset.augment]]
+name = "white_noise"
+options = { snr_db = 20.0 }
+
+[[dataset.augment]]
+name = "reverb"
+options = { decay_s = 0.3, wet_level = 0.3 }
+
+[mixing]
+# Overlap/interruption knobs (design §1/§4.6). The simultaneous-speaker draw is
+# capped at max_simultaneous_speakers.
+max_simultaneous_speakers = 3
+overlap_probability = 0.8
+uncut_probability = 0.5
+
+# Training / evaluation stages — settings read only when the stage is enabled
+# in `stages` above (and the model backend is installed).
+[phase1]
+dataset_root = "data/synthetic"
+epochs = 1
+
+[phase2]
+dataset_root = "data/real"
+epochs = 1
+
+[evaluate]
+dataset_root = "data/synthetic"
+metrics = ["der", "cpwer"]
